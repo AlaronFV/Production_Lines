@@ -29,7 +29,7 @@ def generate_production_tree(resource, amount, allowed_methods, allowed_resource
     :return:
     """
     if tree is None:
-        tree = {"resource": resource, "amount": amount, "time": max_time, "methods": []}
+        tree = {"resource": resource, "amount": amount, "methods": []}
 
     if dependency is None:
         dependency = []
