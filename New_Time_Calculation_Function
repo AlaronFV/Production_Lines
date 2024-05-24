@@ -1,0 +1,65 @@
+from math import ceil
+
+
+class Object:
+    def __init__(self, T: int, X: int, E: int, instances: int = 1, sub_objects=None):
+        self.T = T  # Steps per cycle for this object
+        self.X = X  # How much needed for higher level object
+        self.E = E  # How much it give
+        self.instances = instances  # Number of instances of this object
+        self.sub_objects = sub_objects if sub_objects is not None else []
+
+
+def total_steps_with_efficiency_new(obj, C_total=None):
+    """
+    Calculate the total steps required for an object considering its sub-objects recursively.
+
+    Parameters:
+    - obj (Object): The object for which to calculate the total steps
+    - C_total (int): Total cycles needed for the object
+
+    Returns:
+    - int: Total steps required
+    """
+    steps_total = 0
+    cycles = 0
+
+    if C_total is None:
+        C_total = ceil(obj.X / obj.E)
+
+
+    while cycles < C_total:
+        steps_waits = []
+        for sub_obj in obj.sub_objects:
+            # Calculate the required cycles for this sub-object considering the instances
+            required_cycles = ceil((obj.X * obj.instances * (cycles + 1)) / sub_obj.E)
+            # Recursively calculate the steps needed for this sub-object
+            steps_wait = total_steps_with_efficiency_new(sub_obj, required_cycles)
+            steps_waits.append(steps_wait)
+
+        # Find the maximum steps required for the current cycle
+        steps_wait = max(steps_waits, default=0)
+        steps_total = max(steps_total, steps_wait) + obj.T
+
+        cycles += obj.instances  # Here can be added some restriction on max output speed
+
+    return steps_total
+
+# Example values
+Time_A = 2
+Time_B = 3
+Time_C = 1
+Total_Cycles_A = 5
+B_needed_for_A = 5
+C_needed_for_A = 3
+Out_B = 2
+Out_C = 2
+
+
+sub1 = Object(Time_B, B_needed_for_A, Out_B)
+sub2 = Object(Time_C, C_needed_for_A, Out_C)
+
+main_obj = Object(Time_A, 10, 3, sub_objects=[sub1, sub2])
+
+
+print(total_steps_with_efficiency_new(main_obj))
